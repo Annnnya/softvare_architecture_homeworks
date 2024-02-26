@@ -45,7 +45,7 @@ Same as with 3 nodes
 
 ### With 1 node
 
-With 1 node some data is still lost, so concurrency is not the only issue that causes data loss
+With 1 node some data is still lost, so concurrency is not the only issue that causes data loss. If I use blocking map, all 1k values are written.
 
 ![image](./defq1.png)
 
@@ -53,5 +53,26 @@ With 1 node some data is still lost, so concurrency is not the only issue that c
 
 The map should be blocking. I think that problem oocurs when map is not finished with writing pervious value and next one arrives. Aslo there is no ckeck if the connection is established. If there is an availabilty check, both problems will be solved.
 
-## Distributed map with locks
+## Distributed map with locks and without them
+
+the script launched is in dist_map_locks.py
+
+### 3 clients, no locks
+
+If there is no blocking, some clients write the same values earlier, some later, so the final value is much less than 30000
+
+### pessimistic locking
+
+this method guarantees concurrency by completely blocking out other threads if one thread is currently using the resourece. it works quite slowly
+
+### optimistic locking
+
+here hazelcast might abort update if the version being updated is older ak not the same as latest present version
+
+### Launch results
+
+![image](./locks.png)
+
+
+
 
