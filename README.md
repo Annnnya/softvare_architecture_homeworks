@@ -29,29 +29,37 @@ docker run\
 
 ## Client launches with distributed map
 
+### Management center launch
+
+```bash
+docker run     --network hazelcast-network  -e HZ_CLUSTERNAME=haz_hw1   -p 5705:8080 hazelcast/management-center:latest-snapshot
+```
+
+### Script
+
 Script that was launched for this part is in dist_map.py
 
 ### With 3 nodes
 
-Observed data loss, the data is not evenly distributed, but close to evenly
+No data loss, but distribution between not is not strictly even. Some cluster members have more values, some less, but all in all each cluster has around 1/3
 
-![image](./defq3.png)
+![image](./m1.png)
 
 ### With 2 nodes
 
-Same as with 3 nodes
+Now I killed one node from the terminal. I noticad how data that was distributed between 3 nodes at previous step became evenly distribited between the 2 remaining nodes. Then I deleted data and launched the script again. Surprizingly, data was distributed evenly between nodes. I did not experience data loss.
 
-![image](./defq2.png)
+![image](./q2.png)
 
 ### With 1 node
 
-With 1 node some data is still lost, so concurrency is not the only issue that causes data loss. If I use blocking map, all 1k values are written.
+Now I tried deleting data beforehand, but I still experienced no data loss.
 
-![image](./defq1.png)
+![image](./m3.png)
 
 ### What to do?
 
-The map should be blocking. I think that problem oocurs when map is not finished with writing pervious value and next one arrives. Aslo there is no ckeck if the connection is established. If there is an availabilty check, both problems will be solved.
+The better question would be what to do to experince data loss. If i take away .blocking() in the script, I obtain data loss at each launch. But for me the fact that system for distributed services correctly manges cluster loss is a common sense and I don't see any problem with my obtained result.
 
 ## Distributed map with locks and without them
 
@@ -73,6 +81,18 @@ here hazelcast might abort update if the version being updated is older ak not t
 
 ![image](./locks.png)
 
+
+## Bounded queue
+
+The behavior looks something like I expected:
+
+![image](./q.png)
+
+I won't provide full screenshot as the log is long, but with 2 readers it seenms that queue does not manage to become full, as they read new values faster.
+
+If I comment out reader threads, the code just reaches a lock and code execution doesn't proceed
+
+![image](./qnr.png)
 
 
 
